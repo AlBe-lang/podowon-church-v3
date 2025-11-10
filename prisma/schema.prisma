@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  password         String
+  name             String
+  role             Role               @default(MEMBER)
+  createdAt        DateTime           @default(now())
+  posts            Post[]
+  educationApplies EducationApply[]
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String
+  subtitle  String?
+  period    String?
+  imageUrl  String?
+  updatedAt DateTime @updatedAt
+}
+
+model MenuItem {
+  id      Int     @id @default(autoincrement())
+  label   String
+  path    String
+  order   Int     @default(0)
+  visible Boolean @default(true)
+}
+
+model Notice {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model Sermon {
+  id        Int      @id @default(autoincrement())
+  title     String
+  preacher  String
+  date      DateTime
+  youtube   String?
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  authorId  Int
+  author    User      @relation(fields: [authorId], references: [id])
+  boardType BoardType
+  isSecret  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+}
+
+enum BoardType {
+  NOTICE
+  FREE
+  PRAYER
+}
+
+model Newcomer {
+  id    Int      @id @default(autoincrement())
+  name  String
+  phone String
+  memo  String?
+  date  DateTime @default(now())
+}
+
+model EducationProgram {
+  id          Int                @id @default(autoincrement())
+  name        String
+  description String
+  status      String             @default("모집중")
+  createdAt   DateTime           @default(now())
+  applies     EducationApply[]
+}
+
+model EducationApply {
+  id        Int              @id @default(autoincrement())
+  programId Int
+  program   EducationProgram @relation(fields: [programId], references: [id])
+  userId    Int?
+  user      User?            @relation(fields: [userId], references: [id])
+  name      String
+  date      DateTime         @default(now())
+}
+
+model PageContent {
+  id             Int      @id @default(autoincrement())
+  pageId         String   @unique
+  title          String?
+  publishedData  String   @default("{}")
+  draftData      String   @default("{}")
+  updatedAt      DateTime @updatedAt
+}
+
+model PageStyle {
+  id            Int      @id @default(autoincrement())
+  pageId        String   @unique
+  published     String   @default("{}")
+  draft         String   @default("{}")
+  updatedAt     DateTime @updatedAt
+}
+
+model SiteSettings {
+  id            Int      @id @default(autoincrement())
+  siteName      String   @default("포도원교회")
+  logoUrl       String?
+  primaryColor  String   @default("#4F46E5")
+  secondaryColor String  @default("#6366F1")
+  fontFamily    String   @default("Inter")
+  contactEmail  String?
+  contactPhone  String?
+  address       String?
+  updatedAt     DateTime @updatedAt
+}
