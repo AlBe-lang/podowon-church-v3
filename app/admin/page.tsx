@@ -136,16 +136,6 @@ export default function AdminPage() {
       ]);
 
       const bannerData = await bannerRes.json();
-      if (!bannerData.error) {
-        setBenner({
-          title: bannerData.title ?? '',
-          sutitle: bannerData.subtitle ?? '',
-          period: bannerData.period ?? '',
-          imageUrl: bannerData.imageUrl ?? '',
-          desktopImageUrl: bannerData.desktopImageUrl ?? '',
-          mobileImageUrl: bannerData.mobileImageUrl ?? '',
-        })
-
       }
       if (bannerData) setBanner(bannerData);
 
