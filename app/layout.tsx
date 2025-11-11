@@ -1,14 +1,10 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+// app/layout.tsx
 import './globals.css';
-import SiteHeader from '@/components/site-header';
-import SiteFooter from '@/components/site-footer';
+import TopBar from '@/components/TopBar';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
+export const metadata = {
   title: '포도원교회',
-  description: '하나님의 사랑을 실천하고 이웃과 함께하는 교회',
+  description: '포도원교회 홈페이지',
 };
 
 export default function RootLayout({
@@ -18,10 +14,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={inter.className}>
-        <SiteHeader />
-        <main className="pt-16 min-h-screen">{children}</main>
-        <SiteFooter />
+      <body className="min-h-screen bg-[#f8f5f2] text-slate-900">
+        {/* 상단 네비게이션 */}
+        <TopBar />
+        {/* 페이지 컨텐츠 */}
+        <main>{children}</main>
+        {/* 푸터 */}
+        <footer className="mt-20 border-t border-slate-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500">
+            © {new Date().getFullYear()} 포도원교회. All rights reserved.
+          </div>
+        </footer>
       </body>
     </html>
   );

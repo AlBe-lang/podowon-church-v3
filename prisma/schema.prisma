@@ -27,13 +27,16 @@ enum Role {
 }
 
 model Banner {
-  id        Int      @id @default(autoincrement())
-  title     String
-  subtitle  String?
-  period    String?
-  imageUrl  String?
-  updatedAt DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  title           String
+  subtitle        String?
+  period          String?
+  imageUrl        String?     // 공통으로 쓰고 싶을 때
+  desktopImageUrl String?     // PC용
+  mobileImageUrl  String?     // 모바일용
+  updatedAt       DateTime @updatedAt
 }
+
 
 model MenuItem {
   id      Int     @id @default(autoincrement())

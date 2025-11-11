@@ -1,42 +1,40 @@
-'use client';
-
-import { Calendar } from 'lucide-react';
-
-interface BannerProps {
-  title: string;
-  subtitle?: string;
-  period?: string;
-  imageUrl?: string;
-}
-
-export default function HeroBanner({ title, subtitle, period, imageUrl }: BannerProps) {
+// components/Hero.tsx
+export default function Hero() {
   return (
-    <div className="relative h-[400px] md:h-[500px] overflow-hidden rounded-3xl">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: imageUrl
-            ? `url(${imageUrl})`
-            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-      </div>
-
-      <div className="relative h-full flex flex-col justify-center items-start px-8 md:px-16 text-white">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-          {title}
+    <section
+      className="relative h-[340px] md:h-[420px] bg-cover bg-center flex items-center"
+      style={{
+        backgroundImage:
+          'linear-gradient(110deg, rgba(90,15,78,0.75), rgba(248,245,242,0.0)), url(/images/vineyard.jpg)',
+      }}
+    >
+      <div className="mx-auto max-w-6xl px-4 text-white">
+        <p className="text-xs uppercase tracking-[0.35em] text-slate-100/70">
+          포도원교회 · Podowon Methosdist Church
+        </p>
+        <h1 className="mt-3 text-3xl md:text-4xl font-bold leading-tight drop-shadow-sm">
+          열매 맺는 공동체,
+          <br />
+          주님을 닮아가는 교회
         </h1>
-        {subtitle && (
-          <p className="text-xl md:text-2xl mb-6 drop-shadow-lg">{subtitle}</p>
-        )}
-        {period && (
-          <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-            <Calendar className="w-5 h-5" />
-            <span className="text-sm md:text-base">{period}</span>
-          </div>
-        )}
+        <p className="mt-4 max-w-xl text-sm md:text-base text-slate-100/90">
+          예배와 말씀을 중심으로 한 사람, 한 가정, 한 세대를 세우는 포도원교회입니다.
+        </p>
+        <div className="mt-6 flex gap-3">
+          <a
+            href="/worship/sunday"
+            className="inline-flex items-center rounded-lg bg-white text-slate-900 px-4 py-2 text-sm font-semibold"
+          >
+            예배안내 보기
+          </a>
+          <a
+            href="/sermons"
+            className="inline-flex items-center rounded-lg bg-white/10 border border-white/40 px-4 py-2 text-sm font-semibold"
+          >
+            주일설교
+          </a>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,174 +1,128 @@
-import Link from 'next/link';
-import { Calendar, Book, Users, Bell, ChevronRight } from 'lucide-react';
-import HeroBanner from '@/components/hero-banner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+// app/page.tsx
+import MainCarousel from '@/components/MainCarousel';
+import Hero from '@/components/hero-banner.tsx';
+import QuickInfo from '@/components/QuickInfo.tsx';
+import LatestSermons from '@/components/LatestSermons.tsx';
+import SectionTitle from '@/components/SectionTitle.tsx';
 import { prisma } from '@/lib/prisma';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
-
-async function getBanner() {
-  const banner = await prisma.banner.findFirst({
-    orderBy: { id: 'desc' },
-  });
-  return banner;
-}
-
-async function getMenuItems() {
-  const menuItems = await prisma.menuItem.findMany({
-    where: { visible: true },
-    orderBy: { order: 'asc' },
-    take: 4,
-  });
-  return menuItems;
-}
-
-async function getNotices() {
-  const notices = await prisma.notice.findMany({
-    orderBy: { date: 'desc' },
-    take: 3,
-  });
-  return notices;
-}
-
-async function getSermons() {
-  const sermons = await prisma.sermon.findMany({
-    orderBy: { date: 'desc' },
-    take: 3,
-  });
-  return sermons;
-}
-
-const quickLinkIcons: Record<string, any> = {
-  '/about': Users,
-  '/sermons': Book,
-  '/education': Calendar,
-  '/news': Bell,
-};
 
 export default async function HomePage() {
-  const banner = await getBanner();
-  const menuItems = await getMenuItems();
-  const notices = await getNotices();
-  const sermons = await getSermons();
+  // 배너가 있으면 상단에 보여주고, 없으면 Hero만 보여주기
+  const banners = await prisma.banner.findMany({
+    where: { isActive: true },
+    orderBy: { order: 'asc' },
+  });
 
   return (
-    <div className="min-h-screen">
-      <section className="container mx-auto px-4 py-8">
-        {banner && (
-          <HeroBanner
-            title={banner.title}
-            subtitle={banner.subtitle || undefined}
-            period={banner.period || undefined}
-            imageUrl={banner.imageUrl || undefined}
-          />
-        )}
+    <>
+      {/* 배너가 있을 때만 캐러셀 표시 */}
+      {banners.length > 0 && (
+        <MainCarousel
+          height={520}
+          slides={banners.map((b) => ({
+            id: b.id,
+            src: b.imageUrl, // prisma schema에 맞춰서 필드 이름 확인
+            alt: b.title ?? '포도원교회 배너',
+            href: b.linkUrl ?? undefined,
+          }))}
+        />
+      )}
+
+      {/* 캐러셀 아래 기본 히어로 */}
+      <Hero />
+
+      {/* 빠른 안내 영역 */}
+      <section className="mx-auto max-w-6xl px-4 -mt-12 relative z-10">
+        <QuickInfo />
       </section>
 
-      <section className="container mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold mb-8 text-center">빠른 메뉴</h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          {menuItems.map((item) => {
-            const Icon = quickLinkIcons[item.path] || Users;
-            return (
-              <Link key={item.id} href={item.path}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <CardTitle>{item.label}</CardTitle>
-                  </CardHeader>
-                </Card>
-              </Link>
-            );
-          })}
+      {/* 주일설교 섹션 */}
+      <section id="sermons" className="mx-auto max-w-6xl px-4 mt-16">
+        <SectionTitle
+          title="주일설교"
+          subtitle="말씀으로 세워지는 포도원교회"
+        />
+        <LatestSermons />
+      </section>
+
+      {/* 교회소개 섹션 */}
+      <section
+        id="about"
+        className="mx-auto max-w-6xl px-4 mt-20 grid gap-10 md:grid-cols-2"
+      >
+        <div>
+          <SectionTitle title="교회소개" subtitle="포도원교회의 비전" />
+          <p className="text-slate-600 leading-relaxed">
+            포도원교회는 지역과 다음세대를 품는 건강한 교회를 꿈꿉니다.
+            예배와 말씀, 교제와 선교를 통해 주님의 사랑을 나누고자 합니다.
+          </p>
+          <ul className="mt-6 space-y-3 text-slate-700">
+            <li>• 하나님을 예배하는 교회</li>
+            <li>• 제자를 세우는 교회</li>
+            <li>• 가정을 세우는 교회</li>
+            <li>• 지역을 섬기는 교회</li>
+          </ul>
+        </div>
+        <div className="rounded-2xl bg-slate-50 p-6">
+          <h3 className="text-base font-semibold mb-4">예배시간 안내</h3>
+          <dl className="space-y-3 text-sm text-slate-700">
+            <div className="flex justify-between">
+              <dt>주일 1부 예배</dt>
+              <dd>오전 9:00</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt>주일 2부 예배</dt>
+              <dd>오전 11:00</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt>수요 예배</dt>
+              <dd>오후 7:30</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt>금요 기도회</dt>
+              <dd>오후 9:00</dd>
+            </div>
+          </dl>
         </div>
       </section>
 
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">공지사항</h2>
-              <Link href="/news">
-                <Button variant="ghost" size="sm">
-                  더보기 <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {notices.length > 0 ? (
-                notices.map((notice) => (
-                  <Card key={notice.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{notice.title}</CardTitle>
-                      <CardDescription>
-                        {format(new Date(notice.date), 'yyyy년 M월 d일', { locale: ko })}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 line-clamp-2">{notice.content}</p>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <Card>
-                  <CardContent className="py-8 text-center text-gray-500">
-                    <Bell className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>등록된 공지사항이 없습니다.</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+      {/* 사역안내 섹션 */}
+      <section id="ministries" className="mx-auto max-w-6xl px-4 mt-20">
+        <SectionTitle
+          title="사역안내"
+          subtitle="다음세대와 양육사역이 중심입니다"
+        />
+        <div className="grid gap-6 md:grid-cols-3 mt-6">
+          <div className="rounded-xl border border-slate-200 p-5">
+            <h3 className="font-semibold mb-2">청년부</h3>
+            <p className="text-sm text-slate-600">
+              20~25세 청년들과 함께 예배하고 양육합니다.
+            </p>
           </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">최근 설교</h2>
-              <Link href="/sermons">
-                <Button variant="ghost" size="sm">
-                  더보기 <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {sermons.length > 0 ? (
-                sermons.map((sermon) => (
-                  <Card key={sermon.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{sermon.title}</CardTitle>
-                      <CardDescription>
-                        {sermon.preacher} 목사 ·{' '}
-                        {format(new Date(sermon.date), 'yyyy년 M월 d일', { locale: ko })}
-                      </CardDescription>
-                    </CardHeader>
-                    {sermon.youtube && (
-                      <CardContent>
-                        <a
-                          href={sermon.youtube}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-indigo-600 hover:underline"
-                        >
-                          영상 보기 →
-                        </a>
-                      </CardContent>
-                    )}
-                  </Card>
-                ))
-              ) : (
-                <Card>
-                  <CardContent className="py-8 text-center text-gray-500">
-                    <Book className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>등록된 설교가 없습니다.</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+          <div className="rounded-xl border border-slate-200 p-5">
+            <h3 className="font-semibold mb-2">다음세대</h3>
+            <p className="text-sm text-slate-600">
+              초등~중고등부까지 말씀으로 세워갑니다.
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-200 p-5">
+            <h3 className="font-semibold mb-2">선교/나눔</h3>
+            <p className="text-sm text-slate-600">
+              지역과 열방을 향한 나눔과 선교사역을 합니다.
+            </p>
           </div>
         </div>
       </section>
-    </div>
+
+      {/* 오시는 길 섹션 */}
+      <section id="location" className="mx-auto max-w-6xl px-4 mt-20 mb-20">
+        <SectionTitle title="오시는 길" subtitle="포도원교회 위치 안내" />
+        <div className="rounded-2xl overflow-hidden border border-slate-200">
+          <div className="bg-slate-100 h-64 flex items-center justify-center text-slate-500 text-sm">
+            지도 영역 (다음/네이버 지도 embed)
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

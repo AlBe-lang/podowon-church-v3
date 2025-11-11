@@ -46,7 +46,9 @@ export default function AdminPage() {
     title: '',
     subtitle: '',
     period: '',
-    imageUrl: '',
+    imageUrl: '',  // 공통
+    desktopImageUrl: '',  // PC
+    mobileImageUrl: '',   // 모바일
   });
 
   const [menuItems, setMenuItems] = useState<any[]>([]);
@@ -134,6 +136,17 @@ export default function AdminPage() {
       ]);
 
       const bannerData = await bannerRes.json();
+      if (!bannerData.error) {
+        setBenner({
+          title: bannerData.title ?? '',
+          sutitle: bannerData.subtitle ?? '',
+          period: bannerData.period ?? '',
+          imageUrl: bannerData.imageUrl ?? '',
+          desktopImageUrl: bannerData.desktopImageUrl ?? '',
+          mobileImageUrl: bannerData.mobileImageUrl ?? '',
+        })
+
+      }
       if (bannerData) setBanner(bannerData);
 
       const menusData = await menusRes.json();
