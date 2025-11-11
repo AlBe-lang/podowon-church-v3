@@ -1,5 +1,6 @@
 'use client';
 
+import { prisma } from '@/lib/prisma';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -126,7 +127,7 @@ export default function AdminPage() {
 
   const loadAllData = async () => {
     try {
-      const [bannerRes, menusRes, noticesRes, sermonsRes, postsRes, settingsRes] = await Promise.all([
+      const [bannerRes,menusRes, noticesRes, sermonsRes, postsRes, settingsRes] = await Promise.all([
         fetch('/api/banners'),
         fetch('/api/menus'),
         fetch('/api/notices'),
@@ -136,8 +137,17 @@ export default function AdminPage() {
       ]);
 
       const bannerData = await bannerRes.json();
+      if (!bannerData.error) {
+        setBanner({
+          title: bannerData.title ?? '',
+          subtitle: bannerData.subtitle ?? '',
+          period: bannerData.period ?? '',
+          imageUrl: bannerData.imageUrl ?? '',
+          desktopImageUrl: bannerData.desktopImageUrl ?? '',
+          mobileImageUrl: bannerData.mobileImageUrl ?? '',
+        })
+
       }
-      if (bannerData) setBanner(bannerData);
 
       const menusData = await menusRes.json();
       setMenuItems(menusData);

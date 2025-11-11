@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Banner" ADD COLUMN     "isActive" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "order" INTEGER NOT NULL DEFAULT 0;
