@@ -1,32 +1,35 @@
 // app/page.tsx
-import MainCarousel from '@/components/MainCarousel';
-import Hero from '@/components/hero-banner.tsx';
-import QuickInfo from '@/components/QuickInfo.tsx';
-import LatestSermons from '@/components/LatestSermons.tsx';
-import SectionTitle from '@/components/SectionTitle.tsx';
 import { prisma } from '@/lib/prisma';
+import MainCarousel from '@/components/MainCarousel';
+import Hero from '@/components/hero-banner';
+import QuickInfo from '@/components/QuickInfo';
+import LatestSermons from '@/components/LatestSermons';
+import SectionTitle from '@/components/SectionTitle';
 
 export default async function HomePage() {
-  // 배너가 있으면 상단에 보여주고, 없으면 Hero만 보여주기
+  // DB에서 활성화된 배너만 순서대로 가져오기
   const banners = await prisma.banner.findMany({
     where: { isActive: true },
     orderBy: { order: 'asc' },
   });
 
+  // 캐러셀에 넘겨줄 슬라이드 데이터로 변환
+  const slides =
+    banners.length > 0
+      ? banners.map((b) => ({
+          id: b.id,
+          // 이미지 우선순위: desktop > mobile > 공통 imageUrl
+          imageUrl: b.desktopImageUrl || b.mobileImageUrl || b.imageUrl || '',
+          title: b.title,
+          subtitle: b.subtitle ?? '',
+          period: b.period ?? '',
+        }))
+      : [];
+
   return (
     <>
       {/* 배너가 있을 때만 캐러셀 표시 */}
-      {banners.length > 0 && (
-        <MainCarousel
-          height={520}
-          slides={banners.map((b) => ({
-            id: b.id,
-            src: b.imageUrl, // prisma schema에 맞춰서 필드 이름 확인
-            alt: b.title ?? '포도원교회 배너',
-            href: b.linkUrl ?? undefined,
-          }))}
-        />
-      )}
+      {slides.length > 0 && <MainCarousel height={520} slides={slides} />}
 
       {/* 캐러셀 아래 기본 히어로 */}
       <Hero />
