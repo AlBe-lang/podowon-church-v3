@@ -7,48 +7,38 @@ import LatestSermons from '@/components/LatestSermons';
 import SectionTitle from '@/components/SectionTitle';
 
 export default async function HomePage() {
-  // DB에서 활성화된 배너만 순서대로 가져오기
   const banners = await prisma.banner.findMany({
     where: { isActive: true },
     orderBy: { order: 'asc' },
   });
 
-  // 캐러셀에 넘겨줄 슬라이드 데이터로 변환
-  const slides =
-    banners.length > 0
-      ? banners.map((b) => ({
-          id: b.id,
-          // 이미지 우선순위: desktop > mobile > 공통 imageUrl
-          imageUrl: b.desktopImageUrl || b.mobileImageUrl || b.imageUrl || '',
-          title: b.title,
-          subtitle: b.subtitle ?? '',
-          period: b.period ?? '',
-        }))
-      : [];
-
   return (
     <>
-      {/* 배너가 있을 때만 캐러셀 표시 */}
-      {slides.length > 0 && <MainCarousel height={520} slides={slides} />}
+      {banners.length > 0 && (
+        <MainCarousel
+          height={520}
+          slides={banners.map((b) => ({
+            id: b.id,
+            title: b.title,
+            subtitle: b.subtitle ?? '',
+            imageUrl: b.imageUrl ?? '',
+            desktopImageUrl: b.desktopImageUrl ?? b.imageUrl ?? '',
+            mobileImageUrl: b.mobileImageUrl ?? b.imageUrl ?? '',
+          }))}
+        />
+      )}
 
-      {/* 캐러셀 아래 기본 히어로 */}
       <Hero />
 
-      {/* 빠른 안내 영역 */}
       <section className="mx-auto max-w-6xl px-4 -mt-12 relative z-10">
         <QuickInfo />
       </section>
 
-      {/* 주일설교 섹션 */}
       <section id="sermons" className="mx-auto max-w-6xl px-4 mt-16">
-        <SectionTitle
-          title="주일설교"
-          subtitle="말씀으로 세워지는 포도원교회"
-        />
+        <SectionTitle title="주일설교" subtitle="말씀으로 세워지는 포도원교회" />
         <LatestSermons />
       </section>
 
-      {/* 교회소개 섹션 */}
       <section
         id="about"
         className="mx-auto max-w-6xl px-4 mt-20 grid gap-10 md:grid-cols-2"
@@ -89,35 +79,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 사역안내 섹션 */}
-      <section id="ministries" className="mx-auto max-w-6xl px-4 mt-20">
-        <SectionTitle
-          title="사역안내"
-          subtitle="다음세대와 양육사역이 중심입니다"
-        />
-        <div className="grid gap-6 md:grid-cols-3 mt-6">
-          <div className="rounded-xl border border-slate-200 p-5">
-            <h3 className="font-semibold mb-2">청년부</h3>
-            <p className="text-sm text-slate-600">
-              20~25세 청년들과 함께 예배하고 양육합니다.
-            </p>
-          </div>
-          <div className="rounded-xl border border-slate-200 p-5">
-            <h3 className="font-semibold mb-2">다음세대</h3>
-            <p className="text-sm text-slate-600">
-              초등~중고등부까지 말씀으로 세워갑니다.
-            </p>
-          </div>
-          <div className="rounded-xl border border-slate-200 p-5">
-            <h3 className="font-semibold mb-2">선교/나눔</h3>
-            <p className="text-sm text-slate-600">
-              지역과 열방을 향한 나눔과 선교사역을 합니다.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 오시는 길 섹션 */}
       <section id="location" className="mx-auto max-w-6xl px-4 mt-20 mb-20">
         <SectionTitle title="오시는 길" subtitle="포도원교회 위치 안내" />
         <div className="rounded-2xl overflow-hidden border border-slate-200">
